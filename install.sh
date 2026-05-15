@@ -67,13 +67,13 @@ case $opcion in
         print_info "Instalando ejecutable en ~/.local/bin/..."
         
         # Eliminar versión antigua de /usr/bin si existía para evitar conflictos
-        if [ -f /usr/bin/vidfetch ] || [ -f /usr/bin/vitfetch ]; then
+        if [ -f /usr/bin/vidfetch ]; then
             print_info "Limpiando instalación antigua de /usr/bin/ (requiere permisos sudo)..."
-            sudo rm -f /usr/bin/vidfetch /usr/bin/vitfetch
+            sudo rm -f /usr/bin/vidfetch 
         fi
         
         # Eliminar posible instalación local antigua
-        rm -f ~/.local/bin/vidfetch ~/.local/bin/vitfetch
+        rm -f ~/.local/bin/vidfetch 
         
         if cp vidfetch ~/.local/bin/vidfetch; then
             chmod +x ~/.local/bin/vidfetch
@@ -97,13 +97,17 @@ case $opcion in
         # Crear carpeta única VidFetch en la carpeta de videos del usuario (multi-idioma)
         VIDEOS_DIR=$(xdg-user-dir VIDEOS)
         if [ -n "$VIDEOS_DIR" ]; then
-            mkdir -p "$VIDEOS_DIR/VidFetch"
-            print_success "Carpeta de videos creada en $VIDEOS_DIR/VidFetch"
-            
-            # Mover/copiar videos predeterminados al sistema del usuario si existen
-            if ls videos/*.mp4 1> /dev/null 2>&1; then
-                cp videos/*.mp4 "$VIDEOS_DIR/VidFetch/"
-                print_success "Videos predeterminados copiados a $VIDEOS_DIR/VidFetch"
+            if [ ! -d "$VIDEOS_DIR/VidFetch" ] || ! ls "$VIDEOS_DIR/VidFetch/"*.mp4 1> /dev/null 2>&1; then
+                mkdir -p "$VIDEOS_DIR/VidFetch"
+                print_success "Carpeta de videos preparada en $VIDEOS_DIR/VidFetch"
+                
+                # Mover/copiar videos predeterminados al sistema del usuario si existen
+                if ls videos/*.mp4 1> /dev/null 2>&1; then
+                    cp -n videos/*.mp4 "$VIDEOS_DIR/VidFetch/" 2>/dev/null || true
+                    print_success "Videos predeterminados copiados a $VIDEOS_DIR/VidFetch"
+                fi
+            else
+                print_info "La carpeta $VIDEOS_DIR/VidFetch ya contiene videos. Se conservarán los existentes."
             fi
         fi
 
@@ -120,8 +124,6 @@ case $opcion in
         if [ -z "$vidfetch_path" ]; then
             if [ -f ~/.local/bin/vidfetch ]; then
                 vidfetch_path=~/.local/bin/vidfetch
-            elif [ -f /usr/local/bin/vidfetch ]; then
-                vidfetch_path=/usr/local/bin/vidfetch
             elif [ -f /usr/bin/vidfetch ]; then
                 vidfetch_path=/usr/bin/vidfetch
             fi
