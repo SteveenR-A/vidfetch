@@ -48,7 +48,7 @@ Estas dependencias son **necesarias** para que VidFetch funcione correctamente:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/vidfetch.git
+git clone https://github.com/SteveenR-A/vidfetch.git
 cd vidfetch
 ```
 
